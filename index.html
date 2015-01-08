@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phalcon Cheat Sheet</title>
+    <meta name="description" content="Шпаргалка для Фалькон , код , функции , методы Фалькон фреймворк">
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/monokai_sublime.css">
+
+    <style type="text/css">
+
+        /* Custom style */
+        body { background-color: #2f2f2f !important; color: rgb(150, 150, 150); font: 14px/18px Ubuntu, sans-serif; }
+        .header{ background-color: #f3f3f3; height: 85px; padding-top: 5px;}
+        ul.nav li.active a, ul.nav-tabs li.active a:hover { border-left: 3px solid #118a65; font-weight: 700; color: #118a65;}
+        .nav { margin-top: 15px; }
+        .nav li a { font-size: 14px; color: #7F938D;}
+        .nav > li > a:hover { background-color: transparent; text-decoration: underline; }
+        .logo-text {padding-top:5px; display: block; width: 380px; height: 85px; text-indent: -9999px; background: url('/assets/images/logo.png'); margin-left: 20px; z-index: 10000; background-repeat: no-repeat;}
+        a.headerlink {color: #676767; font-size: 25px; float: left; margin-right: 13px;}
+        hr { border-top: 1px solid #3A3A3A !important; }
+        pre { background-color: #23241f; border: 1px solid #383838 !important; }
+        ul.nav li { height: 25px; }
+        nav>li>a {
+           padding: 1px 3px;
+        }
+
+    </style>
+
+</head>
+<body data-spy="scroll" data-target="#sidebar">
+<a href="https://github.com/mctekk/phalcon-cheat-sheet"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+	<div class="header">
+        <a href="/">
+            <span class="logo-text">Phalcon cheat sheet</span>
+
+        </a>
+    </div>
+    <div class="row container">
+        <div class="col-xs-2 clearfix" id="sidebar">
+            <ul class="nav" id="sections-list">
+                <li class="active">
+                    <a href="#section-1">MVC</a>                    
+                </li>
+                <li><a href="#section-2">ORM</a></li>
+                <li><a href="#section-3">ODM для Mongo</a></li>
+                <li><a href="#section-4">Шаблонизатор (Volt)</a></li>
+                <li><a href="#section-5">DI/IOC</a></li>
+                <li><a href="#section-6">Менеджмент событий</a></li>
+                <li><a href="#section-7">Шифрование</a></li>
+                <li><a href="#section-8">HTTP запросы</a></li>
+                <li><a href="#section-9">Response</a></li>
+                <li><a href="#section-10">Cookies</a></li>
+                <li><a href="#section-11">Escaping</a></li>
+                <li><a href="#section-12">Фильтрация</a></li>
+                <li><a href="#section-13">Построитель форм</a></li>
+                <li><a href="#section-14">Валидация</a></li>
+                <li><a href="#section-15">Всплывающие сообщения</a></li>
+                <li><a href="#section-16">Кеширование</a></li>
+                <li><a href="#section-17">Пагинация</a></li>
+                <li><a href="#section-18">Аннотации</a></li>
+                <li><a href="#section-19">Безопасность</a></li>
+                <li><a href="#section-20">Переводы</a></li>
+                <li><a href="#section-21">Assets Management</a></li>
+                <li><a href="#section-22">Универсальный автозагрузчик</a></li>
+                <li><a href="#section-23">Логирование</a></li>
+                <li><a href="#section-24">CLI</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-10">
+
+            <!-- BEGIN MVC -->
+            <h2 id="section-1"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/applications.html">¶</a> MVC</h2>
+            <pre>
+                <code class="php">
+// Добавление роутер-файла в сервис
+$di->set('router', function() 
+{
+    return include __DIR__ . '[route file]';
+}, true);
+
+// Create custom routes - index.php
+$application->useImplicitView(false);
+
+// Grouping routes under same controller
+$group = new \Phalcon\Mvc\Router\Group([
+    'namespace' => '[namespace separed with double \\]',
+    'controller' => '[controller name]',
+]);
+
+// All the routes start with /group
+$group->setPrefix('/group');
+
+// Adding route to group
+$group->add('[route]', ['action' => '[method]'])->setName('[keyword]');
+$router->mount($group);
+
+// Getting parameters using dispatcher service
+$this->dispatcher->getParam('[parameter]');
+
+// Ways to define a route
+$router->add(
+    '[route]',
+    array(
+        'controller' => '[controller name]',
+        'action' => '[method name]',
+    )
+);
+
+// Single flexible route
+$router->add(
+    '/admin/:controller/a/:action/:params',
+    array(
+        'controller' => 1,
+        'action' => 2,
+        'params' => 3,
+    )
+);
+
+
+// Flexible route with parameters with name
+$router->add(
+    '/news/([0-9]{4})/([0-9]{2})/([0-9]{2})/:params',
+    array(
+        'controller' => 'posts',
+        'action' => 'show',
+        'year' => 1, // ([0-9]{4})
+        'month' => 2, // ([0-9]{2})
+        'day' => 3, // ([0-9]{2})
+        'params' => 4, // :params
+    )
+);
+
+// Route with parameters with name
+$router->add(
+    '/documentation/{chapter}/{name}.{type:[a-z]+}',
+    array(
+        'controller' => 'documentation',
+        'action'     => 'show'
+    )
+);
+
+// Short form using statics
+$router->add("/posts/{year:[0-9]+}/{title:[a-z\-]+}", "Posts::show");
+
+// Array form
+$router->add(
+    "/posts/([0-9]+)/([a-z\-]+)",
+    array(
+       "controller" => "posts",
+       "action"     => "show",
+       "year"       => 1,
+       "title"      => 2,
+    )
+);
+
+// This route only will be matched if the HTTP method is GET
+$router->addGet("/products/edit/{id}", "Products::edit");
+
+// This route only will be matched if the HTTP method is POST
+$router->addPost("/products/save", "Products::save");
+
+// This route will be matched if the HTTP method is POST or PUT
+$router->add("/products/update")->via(array("POST", "PUT"));
+
+// Getting the processed controller
+$router->getControllerName();
+
+// Getting the processed action
+$router->getActionName();
+
+//Get the matched route
+$route = $router->getMatchedRoute();
+
+// Generate a link with predefined route
+$this->url->get(['for' => '<route keyword>', 'paramN' => $paramN]);
+                </code>
+            </pre>
+            <hr>
+            <!-- END MVC -->
+
+            <!-- BEGIN DISPATCHING -->
+            <h2><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/dispatching.html">¶</a> Dispatching Controllers</h2>
+            <pre>
+                <code class="php">
+// Forward flow to the index action
+$this->dispatcher->forward(array(
+    "controller" => "post",
+    "action" => "index"
+));
+
+// Forward flow to another action in the current controller
+$this->dispatcher->forward(array(
+    "action" => "search"
+));
+
+// Forward flow to another action in the current controller passing parameters
+$this->dispatcher->forward(array(
+    "action" => "search",
+    "params" => array(1, 2, 3)
+));
+
+// Get the post's title passed in the URL as parameter or prepared in an event
+$title = $this->dispatcher->getParam('param');
+                </code>
+            </pre>
+            <!-- END DISPATCHING -->
+            <hr>
+
+            <!-- BEGIN MICRO -->
+            <h2><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/dispatching.html">¶</a> Micro applications</h2>
+            <pre>
+                <code class="php">
+// Without controller
+$application->get('/', function(){
+    echo 'Your app it\'s up';
+});
+
+// Using controller, same for get|post|put|delete
+$application->post('[route]', [
+    [instance of your controller]
+    '[method]'
+]);
+
+// Not found route
+$app->notFound(function () use ($app) {
+    $app->response->setStatusCode(404, "Not Found")->sendHeaders();
+    echo 'This is crazy, but this page was not found!';
+});
+                </code>
+            </pre>
+            <hr>
+            <!-- END MICRO -->
+
+            <!-- BEGIN ORM -->
+            <h2 id="section-2"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/models.html">¶</a> ORM</h2>            
+            <pre>
+                <code class="php">
+
+// Find record by its primary id = 3
+$robot = Robots::findFirst(3);
+
+// Find one record with conditions + bind params and all phalcon options
+$robots = Robots::findFirst([
+            "columns” => "id, name”,
+            "conditions" => "type = ?1",
+            "bind"       => [1 => "virtual"],
+            "order" => "id DESC" ,
+            "limit" => "limit" => 10 / "limit" => ["number" => 10, "offset" => 5],
+            "group” => "name, status”,
+            "cache” => array("lifetime” => 3600, "key” => "my-find-key”),
+           ]);
+
+// Find all record with  conditions + bind params and all phalcon options
+$robots = Robots::find([
+            "columns” => "id, name”,
+            "conditions" => "type = ?1",
+            "bind"       => [1 => "virtual"],
+            "order" => "id DESC" ,
+            "limit" => "limit" => 10 / "limit" => ["number" => 10, "offset" => 5],
+            "group” => "name, status”,
+            "cache” => array("lifetime” => 3600, "key” => "my-find-key”),
+           ]);
+
+// Using any Models Query Builder
+$model::query() 
+    ->where('field = :bindparam:')
+    ->andWhere( "field2 = '1' ")
+    ->bind( ['bindparam' => '2'] )
+    ->order('field ASC')
+    ->limit(10)
+    ->cache(['key' => 'optionalifyouwant' , 'lifetime' => 'optionalalso'])
+    ->execute();
+
+// Catch Save / Update Model Exceptions
+$model = new News();
+$model->title = 'Update Phalcon is the fastest php framework';
+$model->content = 'Use version 1.3+ or v2';
+
+if (!$model->save())
+{
+    //messages
+    foreach ($model->getMessages() as $message)
+    {
+        //throw error
+       throw new Exception($message);
+       
+       //or flash message in controller
+       $this->flash->error($message);
+
+    }
+}
+
+// Validate if we have records 
+if($robots) if no records found it returns false
+
+// Count the result set para saber si trajo algo
+$robots->count();
+
+                </code>
+            </pre>
+            <hr>
+            <!-- END ORM -->
+
+
+            <!-- BEGIN ODM -->
+            <h2 id="section-3"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/odm.html">¶</a> ODM for Mongo</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END ORM --> 
+
+            <!-- BEGIN VOLT -->
+            <h2 id="section-4"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/volt.html">¶</a> Template Engine (Volt)</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END VOLT --> 
+
+            <!-- BEGIN DI/IOC -->
+            <h2 id="section-5"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/di.html">¶</a> DI/IOC</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END DI/IOC -->
+
+            <!-- BEGIN EM -->
+            <h2 id="section-6"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/events.html">¶</a> Events Management</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END EM -->
+
+            <!-- BEGIN ENCRYPTION -->
+            <h2 id="section-7"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/crypt.html">¶</a> Encryption</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END ENCRYPTION --> 
+
+            <!-- BEGIN HTTP -->
+            <h2 id="section-8"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/request.html">¶</a> HTTP Request</h2>            
+             <pre>
+                <code class="php">
+// Verify if its Post or Ajax request
+$request = new Phalcon\Http\Request();
+if ($request->isPost() == true) {
+    if ($request->isAjax() == true) {
+            echo 'Request was made using POST and AJAX';
+    }
+}
+
+// Gets a variable from the $_REQUEST superglobal applying filters if needed. If no parameters are given the $_REQUEST superglobal is returned
+
+//Returns value from $_REQUEST["user_email"] without sanitizing
+$userEmail = $request->get("user_email");
+
+//Returns value from $_REQUEST["user_email"] with sanitizing
+$userEmail = $request->get("user_email", "email");
+
+// Gets a variable from the $_POST superglobal applying filters if needed If no parameters are given the $_POST superglobal is returned
+
+//Returns value from $_POST["user_email"] without sanitizing
+$userEmail = $request->getPost("user_email");
+
+//Returns value from $_POST["user_email"] with sanitizing
+$userEmail = $request->getPost("user_email", "email");
+
+// Gets a variable from put request
+
+$userEmail = $request->getPut("user_email");
+
+$userEmail = $request->getPut("user_email", "email");
+
+// Gets variable from $_GET superglobal applying filters if needed If no parameters are given the $_GET superglobal is returned
+
+//Returns value from $_GET["id"] without sanitizing
+$id = $request->getQuery("id");
+
+//Returns value from $_GET["id"] with sanitizing
+$id = $request->getQuery("id", "int");
+
+//Returns value from $_GET["id"] with a default value
+$id = $request->getQuery("id", null, 150);
+
+// Gets HTTP header from request data
+
+$request->getHeader('Name');
+
+// Gets information about schema, host and port used by the request
+
+$request->getClientAddress();
+
+// Checks whether HTTP method is POST. if $_SERVER[‘REQUEST_METHOD’]==’POST’ || GET || PUT || PATCH || HEAD || DELETE  || OPTIONS
+
+$request->isPost();
+$request->isGet();
+$request->isPut();
+
+
+                </code>
+            </pre>
+            <hr>
+            <!-- END HTTP -->
+
+            <!-- BEGIN RESPONSE -->
+            <h2 id="section-9"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/response.html">¶</a> Response</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END RESPONSE -->  
+
+            <!-- BEGIN COOKIES -->
+            <h2 id="section-10"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/cookies.html">¶</a> Cookies</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END COOKIES -->  
+
+            <!-- BEGIN ESCAPING -->
+            <h2 id="section-11"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/escaper.html">¶</a> Escaping</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END ESCAPING -->
+
+            <!-- BEGIN FILTERING -->
+            <h2 id="section-12"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/filter.html">¶</a> Filtering</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END FILTERING --> 
+
+            <!-- BEGIN FORM -->
+            <h2 id="section-13"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/forms.html">¶</a> Forms Builder</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END FORM -->   
+
+            <!-- BEGIN VALIDATION -->
+            <h2 id="section-14"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/validation.html">¶</a> Validation</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END VALIDATION --> 
+
+            <!-- BEGIN FLASH -->
+            <h2 id="section-15"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/flash.html">¶</a> Flash Messages</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END FLASH -->  
+
+            <!-- BEGIN CACHE -->
+            <h2 id="section-16"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/cache.html">¶</a> Cache</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END CACHE --> 
+
+            <!-- BEGIN PAGINATION -->
+            <h2 id="section-17"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/pagination.html">¶</a> Pagination</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END PAGINATION --> 
+
+            <!-- BEGIN ANNOTATIONS -->
+            <h2 id="section-18"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/annotations.html">¶</a> Annotations</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END ANNOTATIONS --> 
+
+            <!-- BEGIN SECURITY -->
+            <h2 id="section-19"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/security.html">¶</a> Security</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END SECURITY -->   
+
+            <!-- BEGIN TRANSLATE -->
+            <h2 id="section-20"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/translate.html">¶</a> Translations</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END TRANSLATE -->
+
+            <!-- BEGIN ASSETS -->
+            <h2 id="section-21"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/assets.html">¶</a> Assets Management</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END ASSETS -->  
+
+            <!-- BEGIN LOADER -->
+            <h2 id="section-22"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/loader.html">¶</a> Universal Auto-Loader</h2>            
+            <pre>
+                <code class="php">
+// Setting namespaces
+$loader->registerNamespaces(
+    array(
+       'Store\Admin\Controllers'    => "../bundles/admin/controllers/",
+       'Store\Admin\Models'    => "../bundles/admin/models/",
+    )
+);
+                </code>
+            </pre> 
+            <hr>
+            <!-- END LOADER -->                                                                                                                                                                                                
+
+            <!-- BEGIN LOGGING -->
+            <h2 id="section-23"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/logging.html">¶</a> Logging</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END LOGGING -->
+
+            <!-- BEGIN CLI -->
+            <h2 id="section-24"><a class="headerlink" href="http://docs.phalconphp.com/en/latest/reference/cli.html">¶</a> CLI</h2>            
+            <i>Pending contribution...</i>
+            <hr>
+            <!-- END CLI -->
+
+        </div>
+    </div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<!-- <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script> -->
+<script src="assets/js/highlight-8.4.min.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+    hljs.initHighlightingOnLoad();
+    $("#sections-list").affix({
+        offset: { 
+            top: 0
+        }
+    });
+});
+</script>
+
+</html>                                		
